@@ -2,6 +2,7 @@ package com.workintech.s19d2.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -28,15 +29,22 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception{
-        return httpSecurity.csrf(csrf->csrf.disable())
-                .authorizeHttpRequests(auth->{
-                    auth.requestMatchers("/admin/**").hasAuthority("ADMIN");
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
+        return http.csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/auth/**").permitAll();
+                    auth.requestMatchers("/welcome/**").permitAll();
+                    auth.requestMatchers("/actuator/**").permitAll();
+                    auth.requestMatchers(HttpMethod.GET, "/account/**")
+                            .hasAnyAuthority("ADMIN", "USER");
+                    auth.requestMatchers(HttpMethod.POST, "/account/**").hasAuthority("ADMIN");
+                    auth.requestMatchers(HttpMethod.PUT, "/account/**").hasAuthority("ADMIN");
+                    auth.requestMatchers(HttpMethod.DELETE, "/account/**").hasAuthority("ADMIN");
+                    auth.anyRequest().authenticated();
                 })
                 .formLogin(Customizer.withDefaults())
-                .httpBasic((Customizer.withDefaults()))
-                .oauth2Login(Customizer.withDefaults())
+                .httpBasic(Customizer.withDefaults())
+                //.oauth2Client(Customizer.withDefaults())
                 .build();
     }
 }

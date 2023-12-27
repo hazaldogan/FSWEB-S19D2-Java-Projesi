@@ -29,19 +29,19 @@ public class AccountController {
         return accountService.findById(id);
     }
 
-    @PostMapping("/admin")
+    @PostMapping
     public Account save(@RequestBody Account account){
         return accountService.save(account);
     }
 
-    @PutMapping("/admin/{id}")
+    @PutMapping("/{id}")
     public Account update(@RequestBody Account account, @PathVariable long id){
         account.setId(id);
         accountService.save(account);
         return account;
     }
 
-    @DeleteMapping("/admin/{id}")
+    @DeleteMapping("/{id}")
     public void delete(@PathVariable long id){
         Account account = accountService.findById(id);
         accountService.delete(account);
